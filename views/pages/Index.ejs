@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <title>Personal Budget</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/site.css">
+    </head>
+    <body>
+        <!--from gotten from https://www.tutorialrepublic.com/codelab.php?topic=bootstrap-3&file=crud-data-table-for-database-with-modal-form-->
+        <div class="container">
+            <div class="table-responsive">
+                <div class="table-wrapper">
+                    <div class="table-title">
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <h2><b>Manage Envelope</b></h2>
+                            </div>
+                            <div class="col-xs-6">
+                                <a href="/Create" class="btn btn-success" data-toggle="modal"><i class="material-icons">&#xE147;</i> <span>Add New Envelope</span></a>
+                                <a href="/Transfer" class="btn btn-success" data-toggle="modal"><i class="material-icons">&#xE147;</i> <span>Transfer funds</span></a>
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Limit</th>
+                                <th>Transfer Amount</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <%for(var i = 0; i <envelopes.length; i++) {%>
+                            <tr>
+                                <td><a href="/envelopes/<%=envelopes[i].Category%>"><%= envelopes[i].Category %></a></td>
+                                <td><%= envelopes[i].Limit %></td>
+                                <td><%= envelopes[i].Transfer %></td>
+                                <td>
+                                    <a href="/envelopes/edit/<%=envelopes[i].Category%>" class="edit" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
+                                    <a href="/envelopes/delete/<%=envelopes[i].Category%>" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
+                                </td>
+                            </tr>  
+                            <%}%>                          
+                        </tbody>
+                    </table>
+                </div>
+            </div>        
+        </div>
+    
+    </body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    <title>Envelope</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/site.css">
+    </head>
+    <body>
+    <form id="TransferForm" method="POST" action="/transfer">
+        <label for="from">Envelope to transfer from:</label>
+        <select id="from" name="from">
+            <%for(var i = 0; i <envelopes.length; i++) {%>
+                <option value="<%= envelopes[i].Category %>" required><%= envelopes[i].Category %></option>
+            <%}%>  
+        </select>
+
+        <br><br>
+
+        <label for="to">Envelope to transfer from:</label>
+        <select id="to" name="to">
+            <%for(var i = 0; i <envelopes.length; i++) {%>
+                <option value="<%= envelopes[i].Category %>" required><%= envelopes[i].Category %></option>
+            <%}%>  
+        </select>
+
+        <input type="submit" value="Submit">
+    </form>
+    </body>
+</html>
