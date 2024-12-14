@@ -23,13 +23,15 @@ app.get("/envelopes", (req, res) =>{
 });
 
 app.get("/envelopes/:category", (req, res) =>{
-    const {category} = req.params;
+    //const {category} = req.params;
 
-    const foundCategory = envelopes.find((cat) => cat.Category === category);
+    //const foundCategory = envelopes.find((cat) => cat.Category === category);
 
-    console.log(foundCategory);
+    //console.log(foundCategory);
 
-    res.render('pages/Envelope', {envelope: foundCategory});;
+    //res.render('pages/Envelope', {envelope: foundCategory});
+
+    db.getOne(req, res);
 });
 
 app.get("/envelopes/edit/:category", (req, res) =>{
