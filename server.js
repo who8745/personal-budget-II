@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParse = require('body-parser');
+const db = require('./db.js');
 
 const app = express();
 
@@ -14,11 +15,11 @@ let envelopes = [{
 app.use(bodyParse.urlencoded({extended: true}));
 
 app.get("/", (req, res) =>{
-    res.render('pages/Index', {envelopes: envelopes});
+    db.getAll(req, res);
 });
 
 app.get("/envelopes", (req, res) =>{
-    res.render('pages/Index', {envelopes: envelopes});
+    db.getAll(req, res);
 });
 
 app.get("/envelopes/:category", (req, res) =>{
