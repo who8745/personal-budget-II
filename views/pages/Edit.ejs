@@ -9,13 +9,13 @@
     <link rel="stylesheet" href="/site.css">
     </head>
     <body>
-    <form id="EnvelopeForm" method="POST" action="/envelopes/<%=envelope.Category%>">
+    <form id="EnvelopeForm" method="POST" action="/envelopes/<%=envelope.name%>">
         <label for="Category">Category Name:</label>
-        <input type="text" id="Category" name="Category" required value="<%=envelope.Category%>" ></br></br>
+        <input type="text" id="Category" name="Category" required value="<%=envelope.name%>" ></br></br>
         <label for="Limit">Spending Limit:</label>
-        <input type="number" id="Limit" name="Limit" required  value="<%=envelope.Limit%>"> </br></br>
+        <input type="number" id="Limit" name="Limit" required  value="<%=envelope.envelope_limit%>"> </br></br>
         <label for="Transfer">Amount that will be transfered:</label>
-        <input type="number" id="Transfer" name="Transfer" required  value="<%=envelope.Transfer%>"></br></br>
+        <input type="number" id="Transfer" name="Transfer" required  value="<%=envelope.transfer_amount%>"></br></br>
         <input type="submit" value="Submit">
     </form>
     </body>

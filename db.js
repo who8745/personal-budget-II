@@ -16,7 +16,7 @@ async function getAll(req, res) {
 
     await client.end();
 
-    console.log(clientData.rows);
+    //console.log(clientData.rows);
 
     res.render('pages/Index', {envelopes: clientData.rows});
 }
@@ -34,13 +34,28 @@ async function getOne(req, res) {
 
     await client.end();
 
-    console.log(obj.category);
-    console.log(clientData.rows[0]);
-
+    //console.log(obj.category);
+    //console.log(clientData.rows[0]);
 
     res.render('pages/Envelope', {envelope: clientData.rows[0]});
 }
 
+async function editGet(req, res) {
+    const client = new Client({
+        connectionString,
+    });
+
+    const obj = req.params;
+
+    await client.connect();
+
+    const clientData = await client.query('SELECT * FROM my_envelopes WHERE name = $1', [obj.category]);
+
+    await client.end();
+
+    res.render('pages/Edit', {envelope: clientData.rows[0]});
+}
+
 module.exports = {
-    getAll, getOne
+    getAll, getOne, editGet
 }
