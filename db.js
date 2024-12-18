@@ -57,7 +57,60 @@ async function getEdit(req, res) {
 }
 
 async function getDelete(req, res) {
+    const client = new Client({
+        connectionString,
+    });
+
+    const obj = req.params;
+
+    await client.connect();
+
+    const clientData = await client.query('SELECT * FROM my_envelopes WHERE name = $1', [obj.category]);
+
+    await client.end();
+
+    res.render('pages/Delete', {envelope: clientData.rows[0]});
+}
+
+async function postDelete(req, res) {
+    const client = new Client({
+        connectionString,
+    });
+
+    await client.connect();
+
+    const Total = await client.query('SELECT * FROM my_envelopes WHERE name = $1', ['Total']);
+    let totalLimit = Total.rows[0].envelope_limit;
+    let totalTransfer = Total.rows[0].transfer_amount;
+
+    console.log(req.params);
+
+    const obj = req.params;
+
+    if(obj.id == "Total"){
+        res.send("You can't delete the total amount");
+    }else{
+        const found = await client.query('SELECT * FROM my_envelopes WHERE name = $1', [obj.id]);
+
+        console.log(found.rows[0]);
+
+        console.log(found.rows[0].envelope_limit);
+
+        totalLimit += found.rows[0].envelope_limit;
+        totalTransfer = totalLimit;
+
+        const deleted = await client.query('DELETE FROM my_envelopes WHERE name = $1', [found.rows[0].name]);
     
+        const update = await client.query('UPDATE my_envelopes SET envelope_limit = $1, transfer_amount = $2 WHERE name = $3',
+            [totalLimit, totalTransfer, 'Total']
+        );
+
+        const clientData = await client.query('SELECT * FROM my_envelopes ORDER BY id ASC');
+        
+        client.end();
+
+        res.render('pages/Index', {envelopes: clientData.rows});
+    }
 }
 
 async function postCreate(req, res) {
@@ -77,10 +130,12 @@ async function postCreate(req, res) {
     const limit = data.Limit;
     const transfer = data.Transfer;
 
+    const name = await client.query('SELECT * FROM my_envelopes WHERE name = $1', [category]);
+
     if(limit > totalLimit){
         res.send("You've ran out of money. T_T");
-    }else if(category == 'total'){
-        res.send("You can't name an envelope Total");
+    }else if(name != null){
+        res.send("Envelope name is already in use.");
     }else{
         totalLimit -= limit;
         totalTransfer -= limit;
@@ -93,6 +148,8 @@ async function postCreate(req, res) {
             [totalLimit, totalTransfer, 'Total']
         );
 
+        client.end();
+
         const clientData = await client.query('SELECT * FROM my_envelopes ORDER BY id ASC');
         res.render('pages/Index', {envelopes: clientData.rows});
     }
@@ -100,5 +157,5 @@ async function postCreate(req, res) {
 
 
 module.exports = {
-    getAll, getOne, getEdit, getDelete, postCreate
+    getAll, getOne, getEdit, getDelete, postCreate, postDelete
 }

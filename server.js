@@ -32,11 +32,7 @@ app.get("/envelopes/edit/:category", (req, res) =>{
 });
 
 app.get("/envelopes/delete/:category", (req, res) =>{
-    const {category} = req.params;
-
-    const foundCategory = envelopes.find((cat) => cat.Category === category);
-
-    res.render('pages/Delete', {envelope: foundCategory});;
+    db.getDelete(req, res);
 });
 
 app.get("/transfer", (req, res) =>{
@@ -49,21 +45,6 @@ app.get("/Create", (req, res) =>{
 });
 
 app.post("/Create", (req, res) =>{
-    /*
-    const totalLimit = envelopes[0].Limit;
-    const data = req.body;
-    const limit = data.Limit;
-
-    if(limit > totalLimit){
-        res.send("You've ran out of money. T_T");
-    }else{
-        envelopes[0].Limit -= limit;
-        envelopes[0].Transfer -= limit;
-        envelopes.push(req.body);
-        res.render('pages/Index', {envelopes: envelopes});
-    }
-    */
-
     db.postCreate(req, res);
 });
 
@@ -107,19 +88,7 @@ app.post("/envelopes/:id", (req, res) =>{
 });
 
 app.post("/delete/:id", (req, res) =>{
-    const {id} = req.params;
-
-    if(id === "Total"){
-        res.send("You can't Delete the total amount");
-    }else{
-        const foundCategory = envelopes.find((cat) => cat.Category === id);
-        envelopes[0].Limit += Number(foundCategory.Limit);
-        envelopes[0].Transfer = envelopes[0].Limit;
-
-        envelopes = envelopes.filter((cat) => cat.Category !== id);
-
-        res.render('pages/Index', {envelopes: envelopes});
-    }
+    db.postDelete(req, res);
 });
 
 app.post("/transfer", (req, res) =>{
