@@ -40,7 +40,7 @@ async function getOne(req, res) {
     res.render('pages/Envelope', {envelope: clientData.rows[0]});
 }
 
-async function editGet(req, res) {
+async function getEdit(req, res) {
     const client = new Client({
         connectionString,
     });
@@ -56,6 +56,49 @@ async function editGet(req, res) {
     res.render('pages/Edit', {envelope: clientData.rows[0]});
 }
 
+async function getDelete(req, res) {
+    
+}
+
+async function postCreate(req, res) {
+    const client = new Client({
+        connectionString,
+    });
+
+    await client.connect();
+
+
+    const Total = await client.query('SELECT * FROM my_envelopes WHERE name = $1', ['Total']);
+    let totalLimit = Total.rows[0].envelope_limit;
+    let totalTransfer = Total.rows[0].transfer_amount;
+
+    const data = req.body;
+    const category = data.Category.toLowerCase();
+    const limit = data.Limit;
+    const transfer = data.Transfer;
+
+    if(limit > totalLimit){
+        res.send("You've ran out of money. T_T");
+    }else if(category == 'total'){
+        res.send("You can't name an envelope Total");
+    }else{
+        totalLimit -= limit;
+        totalTransfer -= limit;
+
+        const insert = await client.query('INSERT INTO my_envelopes(name, envelope_limit, transfer_amount) VALUES($1, $2, $3)',
+            [category, limit, transfer]
+        );
+
+        const update = await client.query('UPDATE my_envelopes SET envelope_limit = $1, transfer_amount = $2 WHERE name = $3',
+            [totalLimit, totalTransfer, 'Total']
+        );
+
+        const clientData = await client.query('SELECT * FROM my_envelopes ORDER BY id ASC');
+        res.render('pages/Index', {envelopes: clientData.rows});
+    }
+}
+
+
 module.exports = {
-    getAll, getOne, editGet
+    getAll, getOne, getEdit, getDelete, postCreate
 }

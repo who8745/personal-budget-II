@@ -28,7 +28,7 @@ app.get("/envelopes/:category", (req, res) =>{
 
 app.get("/envelopes/edit/:category", (req, res) =>{
 
-    db.editGet(req, res);
+    db.getEdit(req, res);
 });
 
 app.get("/envelopes/delete/:category", (req, res) =>{
@@ -49,6 +49,7 @@ app.get("/Create", (req, res) =>{
 });
 
 app.post("/Create", (req, res) =>{
+    /*
     const totalLimit = envelopes[0].Limit;
     const data = req.body;
     const limit = data.Limit;
@@ -61,6 +62,9 @@ app.post("/Create", (req, res) =>{
         envelopes.push(req.body);
         res.render('pages/Index', {envelopes: envelopes});
     }
+    */
+
+    db.postCreate(req, res);
 });
 
 app.post("/envelopes/:id", (req, res) =>{
