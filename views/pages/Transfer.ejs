@@ -13,7 +13,7 @@
         <label for="from">Envelope to transfer from:</label>
         <select id="from" name="from">
             <%for(var i = 0; i <envelopes.length; i++) {%>
-                <option value="<%= envelopes[i].Category %>" required><%= envelopes[i].Category %></option>
+                <option value="<%= envelopes[i].name %>" required><%= envelopes[i].Category %></option>
             <%}%>  
         </select>
 
@@ -22,7 +22,7 @@
         <label for="to">Envelope to transfer from:</label>
         <select id="to" name="to">
             <%for(var i = 0; i <envelopes.length; i++) {%>
-                <option value="<%= envelopes[i].Category %>" required><%= envelopes[i].Category %></option>
+                <option value="<%= envelopes[i].name %>" required><%= envelopes[i].Category %></option>
             <%}%>  
         </select>
 

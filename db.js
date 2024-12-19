@@ -83,18 +83,12 @@ async function postDelete(req, res) {
     let totalLimit = Total.rows[0].envelope_limit;
     let totalTransfer = Total.rows[0].transfer_amount;
 
-    console.log(req.params);
-
     const obj = req.params;
 
     if(obj.id == "Total"){
         res.send("You can't delete the total amount");
     }else{
         const found = await client.query('SELECT * FROM my_envelopes WHERE name = $1', [obj.id]);
-
-        console.log(found.rows[0]);
-
-        console.log(found.rows[0].envelope_limit);
 
         totalLimit += found.rows[0].envelope_limit;
         totalTransfer = totalLimit;
@@ -126,7 +120,7 @@ async function postCreate(req, res) {
     let totalTransfer = Total.rows[0].transfer_amount;
 
     const data = req.body;
-    const category = data.Category.toLowerCase();
+    const category = data.Category;
     const limit = data.Limit;
     const transfer = data.Transfer;
 
@@ -134,7 +128,7 @@ async function postCreate(req, res) {
 
     if(limit > totalLimit){
         res.send("You've ran out of money. T_T");
-    }else if(name != null){
+    }else if(name.rowCount > 0){
         res.send("Envelope name is already in use.");
     }else{
         totalLimit -= limit;
@@ -148,14 +142,99 @@ async function postCreate(req, res) {
             [totalLimit, totalTransfer, 'Total']
         );
 
+        const clientData = await client.query('SELECT * FROM my_envelopes ORDER BY id ASC');
+
         client.end();
 
-        const clientData = await client.query('SELECT * FROM my_envelopes ORDER BY id ASC');
         res.render('pages/Index', {envelopes: clientData.rows});
     }
 }
 
+async function postEdit(req, res) {
+
+    const {id} = req.params;
+
+    const client = new Client({
+        connectionString,
+    });
+
+    await client.connect();
+
+
+    const Total = await client.query('SELECT * FROM my_envelopes WHERE name = $1', ['Total']);
+    let totalLimit = Total.rows[0].envelope_limit;
+    let totalTransfer = Total.rows[0].transfer_amount;
+
+    const data = req.body;
+
+    console.log(data);
+
+    const category = data.Category;
+    let limit = data.Limit;
+    let transfer = data.Transfer;
+
+    limit = Number(limit);
+    transfer = Number(transfer);
+
+    const dbData = await client.query('SELECT * FROM my_envelopes WHERE name = $1', [id]);
+    let dbLimit = Number(dbData.rows[0].envelope_limit);
+
+    if(category !== "Total"){
+        totalLimit += dbLimit;
+            
+        if(limit > totalLimit){
+            totalLimit -= dbLimit;
+            res.send("You've ran out of money. T_T");
+        }else{
+            if(transfer > limit){
+                res.send("Transfer amount can't be more than it's limit.");
+            }else{
+                totalLimit -= limit;
+                totalTransfer = totalLimit;
+
+                const update = await client.query('UPDATE my_envelopes SET name = $1, envelope_limit = $2, transfer_amount = $3 WHERE name = $4',
+                [category, limit, transfer, id]
+                );
+
+                const updateTotal = await client.query('UPDATE my_envelopes SET envelope_limit = $1, transfer_amount = $2 WHERE name = $3',
+                    [totalLimit, totalTransfer, 'Total']
+                );
+
+                const clientData = await client.query('SELECT * FROM my_envelopes ORDER BY id ASC');
+
+                client.end();
+        
+                res.render('pages/Index', {envelopes: clientData.rows});
+            }
+        }
+    }else{
+
+        totalLimit = limit;
+        totalTransfer = totalLimit;
+
+        const updateTotal = await client.query('UPDATE my_envelopes SET envelope_limit = $1, transfer_amount = $2 WHERE name = $3',
+            [totalLimit, totalTransfer, 'Total']
+        );
+
+        const clientData = await client.query('SELECT * FROM my_envelopes ORDER BY id ASC');
+
+        client.end();
+
+        res.render('pages/Index', {envelopes: clientData.rows});
+    }
+}
+
+async function postTransfer(req, res) {
+    
+}
 
 module.exports = {
-    getAll, getOne, getEdit, getDelete, postCreate, postDelete
+    getAll, 
+    getOne, 
+    getEdit, 
+    getDelete, 
+    postCreate, 
+    postDelete, 
+    postEdit, 
+    postTransfer
 }
