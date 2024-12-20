@@ -79,7 +79,7 @@ async function getTransfer(req,res) {
 
     await client.end();
 
-    res.render('pages/transfer', {envelopes: clientData.rows});
+    res.render('pages/Transfer', {envelopes: clientData.rows});
 }
 
 async function postDelete(req, res) {

@@ -54,6 +54,6 @@ app.post("/transfer", (req, res) =>{
     db.postTransfer(req, res);
 });
 
-app.listen("3000", () =>{
-    console.log(`Server running on port 3000`);
+app.listen("5432", () =>{
+    console.log(`Server running on port 5432`);
 });
