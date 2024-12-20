@@ -1,5 +1,5 @@
 const pg = require('pg');
-const {Pool, Client} = pg;
+const {Client} = pg;
 
 const connectionString = 'postgresql://envelope_user:RxKwknAoxGM8sfJ9Zeg1HPQDXWo8lSwC@dpg-ctcvi4dds78s739ld4kg-a.oregon-postgres.render.com/envelope_db_cvg3?ssl=true';
 
@@ -15,8 +15,6 @@ async function getAll(req, res) {
     const clientData = await client.query('SELECT * FROM my_envelopes ORDER BY id ASC');
 
     await client.end();
-
-    //console.log(clientData.rows);
 
     res.render('pages/Index', {envelopes: clientData.rows});
 }
@@ -34,8 +32,6 @@ async function getOne(req, res) {
 
     await client.end();
 
-    //console.log(obj.category);
-    //console.log(clientData.rows[0]);
 
     res.render('pages/Envelope', {envelope: clientData.rows[0]});
 }
@@ -70,6 +66,20 @@ async function getDelete(req, res) {
     await client.end();
 
     res.render('pages/Delete', {envelope: clientData.rows[0]});
+}
+
+async function getTransfer(req,res) {
+    const client = new Client({
+        connectionString,
+    });
+    
+    await client.connect();
+
+    const clientData = await client.query('SELECT * FROM my_envelopes ORDER BY id ASC');
+
+    await client.end();
+
+    res.render('pages/transfer', {envelopes: clientData.rows});
 }
 
 async function postDelete(req, res) {
@@ -225,7 +235,43 @@ async function postEdit(req, res) {
 }
 
 async function postTransfer(req, res) {
+    const client = new Client({
+        connectionString,
+    });
+
+    await client.connect();
+
+    const from = req.body.from;
+    const to = req.body.to;
+
+    const fromData = await client.query('SELECT * FROM my_envelopes WHERE name = $1', [from]);
+    const toData = await client.query('SELECT * FROM my_envelopes WHERE name = $1', [to]);
+
     
+
+    if(fromData.rows[0].id == 1){
+        res.send("You can't transer from total, please use the create page.");
+    }else{
+        toNewLimit = Number(toData.rows[0].envelope_limit) + Number(fromData.rows[0].transfer_amount);
+        fromNewLimit = Number(fromData.rows[0].envelope_limit) - Number(fromData.rows[0].transfer_amount);
+        
+        toNewTransfer = Number(toData.rows[0].transfer_amount) + Number(fromData.rows[0].transfer_amount);
+        fromNewTransfer = 0
+
+        const updateTo = await client.query('UPDATE my_envelopes SET envelope_limit = $1, transfer_amount = $2 WHERE name = $3',
+            [toNewLimit, toNewTransfer, to]
+        );
+
+        const updateFrom = await client.query('UPDATE my_envelopes SET envelope_limit = $1, transfer_amount = $2 WHERE name = $3',
+            [fromNewLimit, fromNewTransfer, from]
+        );
+
+        const clientData = await client.query('SELECT * FROM my_envelopes ORDER BY id ASC');
+
+        client.end();
+
+        res.render('pages/Index', {envelopes: clientData.rows});
+    }
 }
 
 module.exports = {
@@ -233,6 +279,7 @@ module.exports = {
     getOne, 
     getEdit, 
     getDelete, 
+    getTransfer,
     postCreate, 
     postDelete, 
     postEdit, 

@@ -6,12 +6,6 @@ const app = express();
 
 app.set('view engine', 'ejs');
 
-let envelopes = [{
-    Category: "Total",
-    Limit: 2000,
-    Transfer: 2000
-}];
-
 app.use(bodyParse.urlencoded({extended: true}));
 
 app.get("/", (req, res) =>{
@@ -37,7 +31,7 @@ app.get("/envelopes/delete/:category", (req, res) =>{
 
 app.get("/transfer", (req, res) =>{
 
-    res.render('pages/Transfer', {envelopes: envelopes});;
+    db.getTransfer(req, res);
 });
 
 app.get("/Create", (req, res) =>{
@@ -57,24 +51,7 @@ app.post("/delete/:id", (req, res) =>{
 });
 
 app.post("/transfer", (req, res) =>{
-    const from = req.body.from;
-    const to = req.body.to;
-
-
-    const totalLimit = envelopes[0].Limit;
-    const fromIndex = envelopes.findIndex((cat) => cat.Category === from);
-    const toIndex = envelopes.findIndex((cat) => cat.Category === to);
-
-    if(fromIndex === 0){
-        res.send("You can't transer from total, please use the create page.");
-    }else{
-        envelopes[toIndex].Limit = Number(envelopes[toIndex].Limit) + Number(envelopes[fromIndex].Transfer);
-        envelopes[fromIndex].Limit = Number(envelopes[fromIndex].Limit) - Number(envelopes[fromIndex].Transfer);
-        envelopes[toIndex].Transfer = Number(envelopes[toIndex].Transfer) + Number(envelopes[fromIndex].Transfer);
-        envelopes[fromIndex].Transfer = 0;
-
-        res.render('pages/Index', {envelopes: envelopes});
-    }
+    db.postTransfer(req, res);
 });
 
 app.listen("3000", () =>{
