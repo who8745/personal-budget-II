@@ -1,9 +1,24 @@
 const pg = require('pg');
 const {Client} = pg;
 
-const connectionString = 'postgresql://envelope_user:RxKwknAoxGM8sfJ9Zeg1HPQDXWo8lSwC@dpg-ctcvi4dds78s739ld4kg-a/envelope_db_cvg3';
+const connectionString = 'postgres://postgres:andyandy@localhost:5432/enveople_user';
 
+async function testConnection(req, res) {
 
+    let test;
+
+    try {
+        const client = new Client({
+            connectionString,
+        });
+        await client.connect();
+        test = true;
+    } catch (error) {
+        test = false
+    }
+
+    res.render('pages/Home', { test });
+}
 
 async function getAll(req, res) {
     const client = new Client({
@@ -283,5 +298,6 @@ module.exports = {
     postCreate, 
     postDelete, 
     postEdit, 
-    postTransfer
+    postTransfer,
+    testConnection
 }

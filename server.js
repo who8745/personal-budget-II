@@ -9,6 +9,10 @@ app.set('view engine', 'ejs');
 app.use(bodyParse.urlencoded({extended: true}));
 
 app.get("/", (req, res) =>{
+    db.testConnection(req, res);
+});
+
+app.get('/Index', (req, res) =>{
     db.getAll(req, res);
 });
 
@@ -54,6 +58,6 @@ app.post("/transfer", (req, res) =>{
     db.postTransfer(req, res);
 });
 
-app.listen("5432", () =>{
-    console.log(`Server running on port 5432`);
+app.listen("3000", () =>{
+    console.log(`Server running on port 3000`);
 });
