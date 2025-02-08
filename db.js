@@ -298,7 +298,7 @@ async function getAllTrans(req, res) {
 
     await client.connect();
 
-    const clientData = await client.query('SELECT * FROM transactions JOIN my_envelopes ON transactions.envelope_id = my_envelopes.id WHERE my_envelopes.name = $1 ORDER BY transactions.date_sent ASC', [obj.category]);
+    const clientData = await client.query('SELECT transactions.id, transactions.recipient, transactions.payment_amount, transactions.date_sent, transactions.envelope_id FROM transactions JOIN my_envelopes ON transactions.envelope_id = my_envelopes.id WHERE my_envelopes.name = $1 ORDER BY transactions.date_sent ASC', [obj.category]);
 
     const env_id = await client.query('SELECT my_envelopes.id FROM my_envelopes WHERE my_envelopes.name = $1', [obj.category]);
 
@@ -361,6 +361,50 @@ async function postCreateTrans(req, res) {
     }
 }
 
+async function getDeleteTrans(req, res) {
+    const client = new Client({
+        connectionString,
+    });
+
+    const obj = req.params;
+
+    await client.connect();
+
+    const clientData = await client.query('SELECT * FROM transactions WHERE id = $1', [obj.id]);
+
+    await client.end();
+
+    res.render('pages/TransactionsDelete', {trans: clientData.rows[0]});
+}
+
+async function postDeleteTrans(req, res) {
+    const client = new Client({
+        connectionString,
+    });
+
+    await client.connect();
+
+    const obj = req.params;
+
+    const foundTrans = await client.query('SELECT * FROM transactions WHERE id = $1', [obj.id]);
+
+    const foundEnv = await client.query('SELECT * FROM my_envelopes WHERE id = $1', [foundTrans.rows[0].envelope_id]);
+
+    const newLimit = foundTrans.rows[0].payment_amount + foundEnv.rows[0].envelope_limit;
+
+    const deleted = await client.query('DELETE FROM transactions WHERE id = $1', [foundTrans.rows[0].id]);
+
+    const update = await client.query('UPDATE my_envelopes SET envelope_limit = $1, transfer_amount = $2 WHERE id = $3',
+        [newLimit, foundEnv.rows[0].transfer_amount, foundTrans.rows[0].envelope_id]
+    );
+
+    const clientData = await client.query('SELECT * FROM my_envelopes ORDER BY id ASC');
+    
+    client.end();
+
+    res.render('pages/Index', {envelopes: clientData.rows});
+}
+
 module.exports = {
     getAll, 
     getOne, 
@@ -376,8 +420,8 @@ module.exports = {
     getCreateTrans,
     //getOneTrans,
     //getEditTrans,
-    //getDeleteTrans,
+    getDeleteTrans,
     postCreateTrans,
-    //postDeleteTrans,
+    postDeleteTrans,
     //PostEditTrans
 }

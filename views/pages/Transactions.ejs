@@ -35,12 +35,12 @@
                         <tbody>
                             <%for(var i = 0; i <transactions.length; i++) {%>
                             <tr>
-                                <td><a href="/transactions/<%=transactions[i].recipient%>"><%= transactions[i].recipient %></a></td>
+                                <td><a href="/transactions/<%=transactions[i].id%>"><%= transactions[i].recipient %></a></td>
                                 <td><%= transactions[i].payment_amount %></td>
                                 <td><%= transactions[i].date_sent %></td>
                                 <td>
-                                    <a href="/transactions/edit/<%=transactions[i].name%>" class="edit" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
-                                    <a href="/transactions/delete/<%=transactions[i].name%>" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
+                                    <a href="/transactions/edit/<%=transactions[i].id%>" class="edit" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
+                                    <a href="/transactions/delete/<%=transactions[i].id%>" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
                                 </td>
                             </tr>  
                             <%}%>                          
