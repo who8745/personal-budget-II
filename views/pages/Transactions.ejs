@@ -35,7 +35,7 @@
                         <tbody>
                             <%for(var i = 0; i <transactions.length; i++) {%>
                             <tr>
-                                <td><a href="/transactions/<%=transactions[i].id%>"><%= transactions[i].recipient %></a></td>
+                                <td><a href="/transaction/<%=transactions[i].id%>"><%= transactions[i].recipient %></a></td>
                                 <td><%= transactions[i].payment_amount %></td>
                                 <td><%= transactions[i].date_sent %></td>
                                 <td>

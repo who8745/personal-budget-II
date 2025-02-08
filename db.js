@@ -307,6 +307,22 @@ async function getAllTrans(req, res) {
     res.render('pages/Transactions', {transactions: clientData.rows, id: env_id.rows[0].id});
 }
 
+async function getOneTrans(req, res) {
+    const client = new Client({
+        connectionString,
+    });
+
+    let obj = req.params;
+
+    await client.connect();
+
+    const foundTrans = await client.query('SELECT * FROM transactions WHERE id = $1', [obj.id]);
+
+    await client.end();
+
+    res.render('pages/Transaction', {trans: foundTrans.rows[0]});
+}
+
 async function getCreateTrans(req, res) {
     const client = new Client({
         connectionString,
@@ -321,6 +337,38 @@ async function getCreateTrans(req, res) {
     await client.end();
 
     res.render('pages/TransactionsCreate', {id: obj.id});
+}
+
+async function getEditTrans(req, res) {
+    const client = new Client({
+        connectionString,
+    });
+
+    let obj = req.params;
+
+    await client.connect();
+
+    const foundTrans = await client.query('SELECT * FROM transactions WHERE id = $1', [obj.id]);
+
+    await client.end();
+
+    res.render('pages/TransactionsEdit', {trans: foundTrans.rows[0]});
+}
+
+async function getDeleteTrans(req, res) {
+    const client = new Client({
+        connectionString,
+    });
+
+    const obj = req.params;
+
+    await client.connect();
+
+    const clientData = await client.query('SELECT * FROM transactions WHERE id = $1', [obj.id]);
+
+    await client.end();
+
+    res.render('pages/TransactionsDelete', {trans: clientData.rows[0]});
 }
 
 async function postCreateTrans(req, res) {
@@ -361,20 +409,46 @@ async function postCreateTrans(req, res) {
     }
 }
 
-async function getDeleteTrans(req, res) {
+async function PostEditTrans(req, res) {
     const client = new Client({
         connectionString,
     });
+    
+    let obj = req.body;
+    let params = req.params;
 
-    const obj = req.params;
+    console.log(obj);
 
     await client.connect();
 
-    const clientData = await client.query('SELECT * FROM transactions WHERE id = $1', [obj.id]);
+    const foundTrans = await client.query('SELECT * FROM transactions WHERE id = $1', [params.id]);
 
-    await client.end();
+    const envData = await client.query('SELECT * FROM my_envelopes WHERE my_envelopes.id = $1', [foundTrans.rows[0].envelope_id]);
 
-    res.render('pages/TransactionsDelete', {trans: clientData.rows[0]});
+    let limit = envData.rows[0].envelope_limit + foundTrans.rows[0].payment_amount;
+
+    if(obj.Payment > limit){
+        res.send("You've ran out of money for this envelope. T_T");
+    }else{
+        let newLimit = limit - obj.Payment;
+        let newtransfer = envData.rows[0].transfer_amount;
+
+        if(newLimit < newtransfer){
+            newtransfer = newLimit
+        }
+
+        const update = await client.query('UPDATE my_envelopes SET name = $1, envelope_limit = $2, transfer_amount = $3 WHERE id = $4',
+            [envData.rows[0].name, newLimit, newtransfer, foundTrans.rows[0].envelope_id]
+            );
+
+        const transactionUpdate = await client.query('UPDATE transactions SET recipient = $1, payment_amount = $2 WHERE id = $3', [obj.Recipient, obj.Payment, params.id]);
+    
+        const clientData = await client.query('SELECT * FROM my_envelopes ORDER BY id ASC');
+
+        await client.end();
+    
+        res.render('pages/Index', {envelopes: clientData.rows});
+    }
 }
 
 async function postDeleteTrans(req, res) {
@@ -418,10 +492,10 @@ module.exports = {
     testConnection,
     getAllTrans,
     getCreateTrans,
-    //getOneTrans,
-    //getEditTrans,
+    getOneTrans,
+    getEditTrans,
     getDeleteTrans,
     postCreateTrans,
     postDeleteTrans,
-    //PostEditTrans
+    PostEditTrans
 }

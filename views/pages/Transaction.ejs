@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Create Transaction</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/site.css">
+  </head>
+  <body>
+    <form id="TransactionForm" method="GET" action="/envelopes">
+        <label for="Recipient">Recipient Name:</label>
+        <input type="text" id="Recipient" name="Recipient" required value="<%=trans.recipient%>" disabled></br></br>
+        <label for="Payment">Payment Amount:</label>
+        <input type="number" id="Payment" name="Payment" required value="<%=trans.payment_amount%>" disabled> </br></br>
+        <label for="Date">Date & Time:</label>
+        <input type="datetime" id="Date" name="Date" required value="<%=trans.date_sent%>" disabled style="width: 30%;"> </br></br>
+        <input type="submit" value="Submit">
+    </form>
+  </body>
+</html>

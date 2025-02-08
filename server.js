@@ -64,12 +64,12 @@ app.get("/transactions/:category", (req, res) =>{
     db.getAllTrans(req, res);
 });
 
-app.get("/transactions/:id", (req, res) =>{
-
+app.get("/transaction/:id", (req, res) =>{
+    db.getOneTrans(req, res);
 });
 
 app.get("/transactions/edit/:id", (req, res) =>{
-
+    db.getEditTrans(req, res);
 });
 
 app.get("/transactions/delete/:id", (req, res) =>{
@@ -84,11 +84,13 @@ app.post("/TransactionsCreate", (req, res) =>{
     db.postCreateTrans(req, res);
 });
 
+app.post("/TransactionsEdit/:id", (req, res) =>{
+    db.PostEditTrans(req, res);
+});
+
 app.post("/TransactionsDelete/:id", (req, res) =>{
     db.postDeleteTrans(req, res);
 });
-
-
 
 app.use((req, res, next) => {
     res.status(404).send('404 Not Found');
