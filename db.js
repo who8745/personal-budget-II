@@ -289,6 +289,78 @@ async function postTransfer(req, res) {
     }
 }
 
+async function getAllTrans(req, res) {
+    const client = new Client({
+        connectionString,
+    });
+    
+    let obj = req.params;
+
+    await client.connect();
+
+    const clientData = await client.query('SELECT * FROM transactions JOIN my_envelopes ON transactions.envelope_id = my_envelopes.id WHERE my_envelopes.name = $1 ORDER BY transactions.date_sent ASC', [obj.category]);
+
+    const env_id = await client.query('SELECT my_envelopes.id FROM my_envelopes WHERE my_envelopes.name = $1', [obj.category]);
+
+    await client.end();
+
+    res.render('pages/Transactions', {transactions: clientData.rows, id: env_id.rows[0].id});
+}
+
+async function getCreateTrans(req, res) {
+    const client = new Client({
+        connectionString,
+    });
+    
+    let obj = req.params;
+
+    await client.connect();
+
+    const env_id = await client.query('SELECT my_envelopes.id FROM my_envelopes WHERE my_envelopes.name = $1', [obj.category]);
+
+    await client.end();
+
+    res.render('pages/TransactionsCreate', {id: obj.id});
+}
+
+async function postCreateTrans(req, res) {
+    const client = new Client({
+        connectionString,
+    });
+    
+    let obj = req.body;
+
+    console.log(obj);
+
+    await client.connect();
+
+    const envData = await client.query('SELECT * FROM my_envelopes WHERE my_envelopes.id = $1', [obj.id]);
+
+    if(envData.rows[0].envelope_limit < obj.Payment){
+        res.send("You've ran out of money for this envelope. T_T");
+    }else{
+        let newLimit = envData.rows[0].envelope_limit - obj.Payment;
+        let newtransfer = envData.rows[0].transfer_amount;
+
+        if(newLimit < newtransfer){
+            newtransfer = newLimit
+        }
+
+
+        const update = await client.query('UPDATE my_envelopes SET name = $1, envelope_limit = $2, transfer_amount = $3 WHERE id = $4',
+            [envData.rows[0].name, newLimit, newtransfer, obj.id]
+            );
+
+        const transactionInsert = await client.query('INSERT INTO transactions (recipient, payment_amount, date_sent, envelope_id) VALUES($1, $2, CURRENT_TIMESTAMP, $3) ', [obj.Recipient, obj.Payment, obj.id]);
+    
+        const clientData = await client.query('SELECT * FROM my_envelopes ORDER BY id ASC');
+
+        await client.end();
+    
+        res.render('pages/Index', {envelopes: clientData.rows});
+    }
+}
+
 module.exports = {
     getAll, 
     getOne, 
@@ -299,5 +371,13 @@ module.exports = {
     postDelete, 
     postEdit, 
     postTransfer,
-    testConnection
+    testConnection,
+    getAllTrans,
+    getCreateTrans,
+    //getOneTrans,
+    //getEditTrans,
+    //getDeleteTrans,
+    postCreateTrans,
+    //postDeleteTrans,
+    //PostEditTrans
 }

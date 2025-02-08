@@ -16,33 +16,31 @@
                     <div class="table-title">
                         <div class="row">
                             <div class="col-xs-6">
-                                <h2><b>Manage Envelope</b></h2>
+                                <h2><b>Manage Transactions</b></h2>
                             </div>
                             <div class="col-xs-6">
-                                <a href="/Create" class="btn btn-success" data-toggle="modal"><i class="material-icons">&#xE147;</i> <span>Add New Envelope</span></a>
-                                <a href="/Transfer" class="btn btn-success" data-toggle="modal"><i class="material-icons">&#xE147;</i> <span>Transfer funds</span></a>
+                                <a href="/transactions/<%=id%>/Create/" class="btn btn-success" data-toggle="modal"><i class="material-icons">&#xE147;</i> <span>Add New Transactions</span></a>
                             </div>
                         </div>
                     </div>
                     <table class="table table-striped table-hover">
                         <thead>
                             <tr>
-                                <th>Category</th>
-                                <th>Limit</th>
-                                <th>Transfer Amount</th>
+                                <th>Recipient</th>
+                                <th>Payment Amount</th>
+                                <th>Date</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <%for(var i = 0; i <envelopes.length; i++) {%>
+                            <%for(var i = 0; i <transactions.length; i++) {%>
                             <tr>
-                                <td><a href="/envelopes/<%=envelopes[i].name%>"><%= envelopes[i].name %></a></td>
-                                <td><%= envelopes[i].envelope_limit %></td>
-                                <td><%= envelopes[i].transfer_amount %></td>
+                                <td><a href="/transactions/<%=transactions[i].recipient%>"><%= transactions[i].recipient %></a></td>
+                                <td><%= transactions[i].payment_amount %></td>
+                                <td><%= transactions[i].date_sent %></td>
                                 <td>
-                                    <a href="/transactions/<%=envelopes[i].name%>" class="edit" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Payment">$</i></a>
-                                    <a href="/envelopes/edit/<%=envelopes[i].name%>" class="edit" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
-                                    <a href="/envelopes/delete/<%=envelopes[i].name%>" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
+                                    <a href="/transactions/edit/<%=transactions[i].name%>" class="edit" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
+                                    <a href="/transactions/delete/<%=transactions[i].name%>" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
                                 </td>
                             </tr>  
                             <%}%>                          

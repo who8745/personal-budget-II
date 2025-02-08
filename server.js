@@ -54,9 +54,39 @@ app.post("/delete/:id", (req, res) =>{
     db.postDelete(req, res);
 });
 
+
 app.post("/transfer", (req, res) =>{
     db.postTransfer(req, res);
 });
+
+
+app.get("/transactions/:category", (req, res) =>{
+    db.getAllTrans(req, res);
+});
+
+app.get("/transactions/:id", (req, res) =>{
+
+});
+
+app.get("/transactions/edit/:id", (req, res) =>{
+
+});
+
+app.get("/transactions/delete/:id", (req, res) =>{
+
+});
+
+app.get("/transactions/:id/create", (req, res) =>{
+    db.getCreateTrans(req, res);
+});
+
+app.post("/TransactionsCreate", (req, res) =>{
+    db.postCreateTrans(req, res);
+});
+
+app.use((req, res, next) => {
+    res.status(404).send('404 Not Found');
+  });
 
 app.listen("3000", () =>{
     console.log(`Server running on port 3000`);

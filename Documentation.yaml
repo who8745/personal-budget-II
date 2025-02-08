@@ -1,0 +1,248 @@
+openapi: 3.0.1
+info:
+  title: Personal Budget II
+  version: 1.0.0
+  description: Basic budgeting app using the envelope method
+paths:
+  /:
+    summary: shows a basic page stating if the DB is connected
+    get:
+      summary: Shows a page that test if the DB is connected or not
+      description: ''
+      operationId: get_db
+      responses:
+        default:
+          description: Default error sample response
+  /Index:
+    summary: Show a list of all envelopes
+    get:
+      summary: Show a list of all envelopes
+      description: ''
+      operationId: get_envelopes
+      responses:
+        default:
+          description: Default error sample response
+  /envelopes:
+    summary: Show a list of all envelopes
+    get:
+      summary: Show a list of all envelopes
+      description: ''
+      operationId: get_envelopes2
+      responses:
+        default:
+          description: Default error sample response
+      tags:
+        - envelopes
+  /envelopes/:category:
+    summary: Show info about a single envelope
+    get:
+      summary: Show info for a single envelope
+      description: ''
+      operationId: get_envelope
+      responses:
+        default:
+          description: Default error sample response
+      tags:
+        - envelopes
+  /envelopes/edit/:category:
+    summary: Show the edit page for a single envelope
+    get:
+      summary: Show an edit page for a single envelope
+      description: ''
+      operationId: get_edit
+      responses:
+        default:
+          description: Default error sample response
+      tags:
+        - envelopes
+    put:
+      summary: Edit an envelope
+      description: ''
+      operationId: put_edit
+      responses:
+        default:
+          description: Default error sample response
+          content:
+            application/json:
+              examples:
+                Edit post example data:
+                  value: '{ Category: ''taxes'', Limit: ''4'', Transfer: ''3'' }'
+      tags:
+        - envelopes
+  /envelopes/delete/:category:
+    summary: Show the delete page for an envelope
+    get:
+      summary: Show the delete page for an envelope
+      description: ''
+      operationId: get_delete
+      responses:
+        default:
+          description: Default error sample response
+      tags:
+        - envelopes
+    delete:
+      summary: Delete the envelope from the DB
+      description: ''
+      operationId: delete_envelope
+      responses:
+        default:
+          description: Default error sample response
+      tags:
+        - envelopes
+  /Create:
+    summary: Show a page to create an envelope
+    get:
+      summary: Show the envelope create page
+      description: ''
+      operationId: get_create
+      responses:
+        default:
+          description: Default error sample response
+      tags:
+        - envelopes
+    post:
+      summary: Post the create envelope body
+      description: ''
+      operationId: post_create
+      responses:
+        default:
+          description: Default error sample response
+          content:
+            application/json:
+              examples:
+                create post example:
+                  value: '{ Category: ''taxes'', Limit: ''5'', Transfer: ''3'' }'
+      tags:
+        - envelopes
+  /transfer:
+    summary: Show the envelope transfer page
+    get:
+      summary: 'Show the transfer page '
+      description: ''
+      operationId: get_transfer
+      responses:
+        default:
+          description: Default error sample response
+      tags:
+        - envelopes
+    post:
+      summary: Transfer money from one envelope to another
+      description: ''
+      operationId: post_transfer
+      responses:
+        default:
+          description: Default error sample response
+      tags:
+        - envelopes
+  /transactions/:category:
+    summary: Show all the transactions for an envelope
+    get:
+      summary: Get a list of transactions for an envelope
+      description: ''
+      operationId: get_transactions
+      responses:
+        default:
+          description: Default error sample response
+      tags:
+        - transactions
+  /transactions/:id:
+    summary: Show the info for a single transaction
+    get:
+      summary: Get info for a single transaction
+      description: ''
+      operationId: get_transaction
+      responses:
+        default:
+          description: Default error sample response
+      tags:
+        - transactions
+  /transactions/edit/:id:
+    summary: Show the edit page for a transaction
+    get:
+      summary: Get the edit page for a transaction
+      description: ''
+      operationId: get_trans_edit
+      responses:
+        default:
+          description: Default error sample response
+      tags:
+        - transactions
+    put:
+      summary: Edit the info for a transaction in the DB
+      description: ''
+      operationId: put_trans_edit
+      responses:
+        default:
+          description: Default error sample response
+      tags:
+        - transactions
+  /transactions/delete/:id:
+    summary: Show the delete page for a transaction
+    get:
+      summary: Get the delete page for a transaction
+      description: ''
+      operationId: get_trans_delete
+      responses:
+        default:
+          description: Default error sample response
+      tags:
+        - transactions
+    delete:
+      summary: Delete a transaction from an envelope
+      description: ''
+      operationId: delete_trans
+      responses:
+        default:
+          description: Default error sample response
+      tags:
+        - transactions
+  /transactions/create:
+    summary: Show the create page to make a transaction
+    get:
+      summary: Get the create page to make a new transaction
+      description: ''
+      operationId: get_trans_create
+      responses:
+        default:
+          description: Default error sample response
+      tags:
+        - transactions
+    post:
+      summary: Post html body to create a new transaction
+      description: ''
+      operationId: post_trans_create
+      responses:
+        default:
+          description: Default error sample response
+      tags:
+        - transactions
+components:
+  schemas:
+    envelope:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        limit:
+          type: integer
+        transfer:
+          type: integer
+      xml:
+        name: envelope
+    transaction:
+      type: object
+      properties:
+        id:
+          type: integer
+        recipient:
+          type: string
+        payment:
+          type: integer
+        date:
+          type: string
+        envelope_id:
+          type: integer
+      xml:
+        name: envelope
