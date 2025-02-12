@@ -3,6 +3,48 @@ const {Client} = pg;
 
 const connectionString = 'postgres://postgres:andyandy@localhost:5432/enveople_user';
 
+async function getAllEnvelopes() {
+    const client = new Client({
+        connectionString,
+    });
+    
+    await client.connect();
+
+    const clientData = await client.query('SELECT * FROM my_envelopes ORDER BY id ASC');
+
+    await client.end();
+
+    return clientData;
+}
+
+async function getOneEnvelope(obj) {
+    const client = new Client({
+        connectionString,
+    });
+    
+    await client.connect();
+
+    const clientData = await client.query('SELECT * FROM my_envelopes WHERE name = $1', [obj.category]);
+
+    await client.end();
+
+    return clientData;
+}
+
+async function getOneTransaction(obj) {
+    const client = new Client({
+        connectionString,
+    });
+
+    await client.connect();
+
+    const foundTrans = await client.query('SELECT * FROM transactions WHERE id = $1', [obj.id]);
+
+    await client.end();
+
+    return foundTrans;
+}
+
 async function testConnection(req, res) {
 
     let test;
@@ -21,78 +63,37 @@ async function testConnection(req, res) {
 }
 
 async function getAll(req, res) {
-    const client = new Client({
-        connectionString,
-    });
-    
-    await client.connect();
-
-    const clientData = await client.query('SELECT * FROM my_envelopes ORDER BY id ASC');
-
-    await client.end();
+    const clientData = await getAllEnvelopes();
 
     res.render('pages/Index', {envelopes: clientData.rows});
 }
 
 async function getOne(req, res) {
-    const client = new Client({
-        connectionString,
-    });
-
     const obj = req.params;
-    
-    await client.connect();
 
-    const clientData = await client.query('SELECT * FROM my_envelopes WHERE name = $1', [obj.category]);
-
-    await client.end();
-
+    const clientData = await getOneEnvelope(obj);
 
     res.render('pages/Envelope', {envelope: clientData.rows[0]});
 }
 
 async function getEdit(req, res) {
-    const client = new Client({
-        connectionString,
-    });
-
     const obj = req.params;
 
-    await client.connect();
-
-    const clientData = await client.query('SELECT * FROM my_envelopes WHERE name = $1', [obj.category]);
-
-    await client.end();
+    const clientData = await getOneEnvelope(obj);
 
     res.render('pages/Edit', {envelope: clientData.rows[0]});
 }
 
 async function getDelete(req, res) {
-    const client = new Client({
-        connectionString,
-    });
-
     const obj = req.params;
 
-    await client.connect();
-
-    const clientData = await client.query('SELECT * FROM my_envelopes WHERE name = $1', [obj.category]);
-
-    await client.end();
+    const clientData = await getOneEnvelope(obj);
 
     res.render('pages/Delete', {envelope: clientData.rows[0]});
 }
 
 async function getTransfer(req,res) {
-    const client = new Client({
-        connectionString,
-    });
-    
-    await client.connect();
-
-    const clientData = await client.query('SELECT * FROM my_envelopes ORDER BY id ASC');
-
-    await client.end();
+    const clientData = await getAllEnvelopes();
 
     res.render('pages/Transfer', {envelopes: clientData.rows});
 }
@@ -262,8 +263,6 @@ async function postTransfer(req, res) {
     const fromData = await client.query('SELECT * FROM my_envelopes WHERE name = $1', [from]);
     const toData = await client.query('SELECT * FROM my_envelopes WHERE name = $1', [to]);
 
-    
-
     if(fromData.rows[0].id == 1){
         res.send("You can't transer from total, please use the create page.");
     }else{
@@ -308,67 +307,33 @@ async function getAllTrans(req, res) {
 }
 
 async function getOneTrans(req, res) {
-    const client = new Client({
-        connectionString,
-    });
-
     let obj = req.params;
 
-    await client.connect();
-
-    const foundTrans = await client.query('SELECT * FROM transactions WHERE id = $1', [obj.id]);
-
-    await client.end();
+    const foundTrans = await getOneTransaction(obj);
 
     res.render('pages/Transaction', {trans: foundTrans.rows[0]});
 }
 
-async function getCreateTrans(req, res) {
-    const client = new Client({
-        connectionString,
-    });
-    
+async function getCreateTrans(req, res) {    
     let obj = req.params;
-
-    await client.connect();
-
-    const env_id = await client.query('SELECT my_envelopes.id FROM my_envelopes WHERE my_envelopes.name = $1', [obj.category]);
-
-    await client.end();
 
     res.render('pages/TransactionsCreate', {id: obj.id});
 }
 
 async function getEditTrans(req, res) {
-    const client = new Client({
-        connectionString,
-    });
-
     let obj = req.params;
 
-    await client.connect();
-
-    const foundTrans = await client.query('SELECT * FROM transactions WHERE id = $1', [obj.id]);
-
-    await client.end();
+    const foundTrans = await getOneTransaction(obj);
 
     res.render('pages/TransactionsEdit', {trans: foundTrans.rows[0]});
 }
 
 async function getDeleteTrans(req, res) {
-    const client = new Client({
-        connectionString,
-    });
+    let obj = req.params;
 
-    const obj = req.params;
+    const foundTrans = await getOneTransaction(obj);
 
-    await client.connect();
-
-    const clientData = await client.query('SELECT * FROM transactions WHERE id = $1', [obj.id]);
-
-    await client.end();
-
-    res.render('pages/TransactionsDelete', {trans: clientData.rows[0]});
+    res.render('pages/TransactionsDelete', {trans: foundTrans.rows[0]});
 }
 
 async function postCreateTrans(req, res) {
